@@ -288,7 +288,7 @@ All Thin Passive Tools are built from hardened steel, contain no electronics or 
 
 ### Printer Requirements
 
-- **Motion system:** CoreXY, H-bot, Markforged, Cartesian XY-head, or similar. Supported: any motion system where the toolhead moves in XY and Z is handled by the bed or gantry — i.e. CoreXY (not cross-gantry), H-bot, Markforged, and independent-axis Cartesian (XY-head, e.g. Ender 5). Not supported: bed-slinger Cartesian (XZ-head), where the bed moves in Y.
+- **Motion system:** CoreXY, H-bot, Markforged, Cartesian XY-head, or similar. Supported: any motion system where the toolhead moves in XY and Z is handled by the bed or gantry — i.e. CoreXY (not cross-gantry), H-bot, Markforged, and independent-axis Cartesian (XY-head, e.g. Ender 5). Not supported: bed-slinger Cartesian (XZ-head), where the bed moves in Y, or on Positron style machines.
 - **Firmware:** Klipper, Kalico, or RepRap Firmware (RRF)
 - **Gantry clearance:** 50mm X, 44mm Y. Total toolhead height is ~152mm including strain relief. Additional clearance is required for umbilical and filament management.
 - **Dock mounting area:** Each dock is ~70mm tall, 28.5mm wide (X), and 25mm deep (Y). Minimum tool center-to-center spacing is 34mm bare, or 41mm when using the Bondtech part cooling solutions.
