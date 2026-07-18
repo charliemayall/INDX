@@ -23,8 +23,8 @@
    - [Firmware Configuration](#firmware-configuration)
      - [Klipper / Kalico](#klipper)
        - [INDX macro files](#indx-macro-files)
-       - [INDX Extras plugin](#indx-extras-plugin-optional--enables-advanced-calibration)
-       - [Homing override](#homing-order--important)
+       - [Automated dock X measurement](#automated-dock-x-measurement-built-in)
+       - [Homing override](#homing-order-important)
      - [RRF (RepRapFirmware)](#rrf-reprapfirmware)
    - [Initial Startup](#initial-startup)
 
@@ -32,12 +32,12 @@
 
 8. [Configuration](#configuration)
    - [Dock Position Calibration](#dock-position-calibration)
-     - [Finding dock_y](#finding-dock_y-y--fully-seated-position)
-     - [Finding dock_x](#finding-dock_x-x--tool-centre)
+     - [Finding dock_y](#finding-dock_y-y-fully-seated-position)
+     - [Finding dock_x](#finding-dock_x-x-tool-centre)
    - [Tool Offsets](#tool-offsets)
-     - [Method 1: Print and adjust](#method-1--print-and-adjust-free-no-extra-hardware)
-     - [Method 2: Nudge](#method-2--nudge-automatic-requires-small-hardware)
-     - [Method 3: Nozzle camera + CAL_01/02/03](#method-3--nozzle-camera-most-precise-xy-higher-cost)
+     - [Method 1: Print and adjust](#method-1-print-and-adjust-free-no-extra-hardware)
+     - [Method 2: Nudge](#method-2-nudge-automatic-requires-small-hardware)
+     - [Method 3: Nozzle camera + CAL_01/02/03](#method-3-nozzle-camera-most-precise-xy-higher-cost)
      - [Z offset: CAL_Z](#z-offset-calibration)
    - [Temperature & Induction Settings](#temperature--induction-settings)
    - [Speed & Acceleration](#speed--acceleration)
@@ -1660,7 +1660,7 @@ After rebooting, run `ls /dev/serial/by-id/` to confirm the Link Board is now vi
 
 If the Smart Head slams into the dock or the docked tools when you run `G28`, the most likely cause is that the homing order has not been configured. By default, Klipper homes X before Y; if the Smart Head is near the dock when homing starts, a full-speed X move can send it directly into the dock.
 
-Add a `[homing_override]` section to your `printer.cfg` that homes Y before X. See [Homing order](#homing-order--important) for the recommended config. After any crash, re-home the printer before moving on; the stepper motors may have lost steps, making the position shown in your interface unreliable.
+Add a `[homing_override]` section to your `printer.cfg` that homes Y before X. See [Homing order](#homing-order-important) for the recommended config. After any crash, re-home the printer before moving on; the stepper motors may have lost steps, making the position shown in your interface unreliable.
 
 ### Extruder feeding filament in the wrong direction
 
