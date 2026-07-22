@@ -851,6 +851,7 @@ The INDX firmware plugin provides a set of `.cfg` files you include from `printe
 | `indx.cfg` | User configuration: tool positions and related settings. **The only file you need to edit.** |
 | `indx-tc-macros.cfg` | Tool change logic: `CHANGE_TOOL`, `PARK_TOOL`, boot detection. Do not edit. |
 | `indx-cal.cfg` | Calibration macros: dock position, XY/Z offset calibration. |
+| `homing.cfg` | `[homing_override]`: Y then X, ensure a tool (T0 when possible), then Z. |
 
 Include them from your `printer.cfg`:
 
@@ -858,7 +859,10 @@ Include them from your `printer.cfg`:
 [include indx/indx.cfg]
 [include indx/indx-tc-macros.cfg]
 [include indx/indx-cal.cfg]
+[include indx/homing.cfg]
 ```
+
+Klipper allows only one `[homing_override]`. If your printer already has one (sensorless current, bed raiser, etc.), merge the INDX sequence into yours instead of including `homing.cfg` as-is.
 
 ##### Automated dock X measurement (built in)
 
@@ -879,14 +883,15 @@ With a dock mounted on your printer, the default homing sequence can cause crash
 
 The INDX macro package includes a ready-to-use `[homing_override]` in `homing.cfg` that handles all of this. Its sequence, in full:
 
-1. Move Z up slightly to clear the bed before any XY movement (move bed down if using a bed raiser)
-2. Home Y (with reduced TMC current for sensorless homing)
-3. Home X (with reduced TMC current for sensorless homing)
-4. If any tool other than T0 is active: park it in the dock
-5. If T0 is not already picked up: pick up T0
-6. Move to bed centre and home Z
+1. If Z is already known: raise to `probe_z_clearance` (set in `indx.cfg`)
+2. Home Y, then move to `clearance_y` so X does not sweep into the dock
+3. Home X
+4. Before Z: require a seated tool (`VERIFY_TOOL_PRESENT`). If Z is known and the head is empty or not on T0, park/pick T0 via the dock. If Z has never been homed, dock pickup is unsafe - seat and lock a tool by hand after load-cell calibration, then home. Empty-head Z is refused (the load cell will not trigger without a nozzle).
+5. Move to the probe XY (`probe_x` / `probe_y`, or bed centre) and home Z
 
-T0 is always the reference tool for Z homing. This ensures Z is always probed with the same tool, keeping Z offsets for all other tools consistent.
+T0 is the reference tool for Z when the dock is usable. That keeps other tools' Z offsets consistent.
+
+If you use sensorless XY homing, wrap the `G28 Y` / `G28 X` steps in your usual TMC current reduce/restore (merge into the override if you already have one).
 
 **Review your `PRINT_START` macro**
 
@@ -1068,8 +1073,9 @@ Before any tool changes can happen, you need to find and save the exact dock pos
 | -------- | ------- |
 | `variable_t{n}_x` | X coordinate of the tool holder centre (mm) |
 | `variable_t{n}_dock_y` | Y coordinate where the tool is fully seated (mm) |
+| `variable_dock_dir` | Y sign into the dock: `-1` front (min Y), `+1` rear (max Y). Default `-1`. |
 
-The trigger line (`dock_y + trigger_offset`) is derived automatically; you only set `dock_y`.
+The trigger line (`dock_y - dock_dir * trigger_offset`) is derived automatically; you only set `dock_y`. For a rear dock, set `variable_dock_dir: 1` and put `clearance_y` on the bed side of the tools.
 
 > ⚠️ **Take this slow.** Moving the Smart Head into the dock area without verified coordinates is one of the most crash-prone steps in the entire INDX setup. A misaligned approach at speed can damage the Smart Head, the passive tools, or the dock itself.
 >
@@ -1088,7 +1094,7 @@ With the Smart Head holding the tool, carefully jog in Y in small increments unt
 CAL_SET_DOCK_Y
 ```
 
-The console will report the correct `dock_y` value for that tool, calculated from your current Y position and the configured `trigger_offset`. Paste the reported value into `indx.cfg`:
+The console will report the current Y as `dock_y` for that tool. Paste the reported value into `indx.cfg`:
 
 ```ini
 variable_t0_dock_y: -26.0   # from CAL_SET_DOCK_Y output
