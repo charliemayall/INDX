@@ -1,0 +1,278 @@
+{
+	"bed_custom_model": "/Users/charlie/Desktop/3D/vzbot/z_axis/SlicerBedModel.stl",
+	"bed_exclude_area": [],
+	"before_layer_change_gcode": ";BEFORE_LAYER_CHANGE\n;[layer_z]\n;TIMELAPSE_TAKE_FRAME\nG92 E0\n",
+	"change_filament_gcode": "; VZBOT_INDX tool change - T with early heat, then post-TC purge station\nT{next_extruder} TEMP={temperature[next_extruder]}\nM400\nINDX_TC_POST TEMP={temperature[next_extruder]}\n",
+	"default_filament_profile": [
+		"Tronxy Generic PLA"
+	],
+	"default_nozzle_volume_type": [
+		"Standard",
+		"Standard",
+		"Standard",
+		"Standard"
+	],
+	"deretraction_speed": [
+		"30",
+		"30",
+		"30",
+		"30"
+	],
+	"emit_machine_limits_to_gcode": "0",
+	"enable_filament_ramming": "0",
+	"extruder_colour": [
+		"#F58231",
+		"#1F77B4",
+		"#2CA02C",
+		"#D62728"
+	],
+	"extruder_offset": [
+		"0x0",
+		"0x0",
+		"0x0",
+		"0x0"
+	],
+	"extruder_printable_height": [
+		"0",
+		"0",
+		"0",
+		"0"
+	],
+	"extruder_type": [
+		"Direct Drive",
+		"Direct Drive",
+		"Direct Drive",
+		"Direct Drive"
+	],
+	"extruder_variant_list": [
+		"Direct Drive Standard",
+		"Direct Drive Standard",
+		"Direct Drive Standard",
+		"Direct Drive Standard"
+	],
+	"fan_speedup_time": "2.2",
+	"from": "User",
+	"gcode_flavor": "klipper",
+	"inherits": "Tronxy X5SA 400 0.4 nozzle",
+	"layer_change_gcode": "SET_PRINT_STATS_INFO CURRENT_LAYER={layer_num + 1}",
+	"long_retractions_when_cut": [
+		"0",
+		"0",
+		"0",
+		"0"
+	],
+	"machine_end_gcode": "PRINT_END\n; total layers count = [total_layer_count]\n",
+	"machine_max_acceleration_e": [
+		"10000",
+		"2000"
+	],
+	"machine_max_acceleration_extruding": [
+		"50000",
+		"50000"
+	],
+	"machine_max_acceleration_retracting": [
+		"50000",
+		"50000"
+	],
+	"machine_max_acceleration_x": [
+		"50000",
+		"50000"
+	],
+	"machine_max_acceleration_y": [
+		"50000",
+		"50000"
+	],
+	"machine_max_acceleration_z": [
+		"100",
+		"200"
+	],
+	"machine_max_jerk_x": [
+		"9",
+		"20"
+	],
+	"machine_max_jerk_y": [
+		"9",
+		"20"
+	],
+	"machine_max_speed_x": [
+		"800",
+		"1400"
+	],
+	"machine_max_speed_y": [
+		"800",
+		"1400"
+	],
+	"machine_max_speed_z": [
+		"50",
+		"50"
+	],
+	"machine_pause_gcode": "PAUSE",
+	"machine_start_gcode": "SET_PRINT_STATS_INFO TOTAL_LAYER=[total_layer_count]\n[notes]\n\nPRINT_START BED_TEMP=[bed_temperature_initial_layer_single] EXTRUDER_TEMP={first_layer_temperature[initial_tool]} TOOL=[initial_tool]\n",
+	"machine_tool_change_time": "12",
+	"max_layer_height": [
+		"0.32",
+		"0.32",
+		"0.32",
+		"0.32"
+	],
+	"min_layer_height": [
+		"0.12",
+		"0.12",
+		"0.12",
+		"0.12"
+	],
+	"name": "VZBOT_INDX",
+	"nozzle_diameter": [
+		"0.4",
+		"0.4",
+		"0.4",
+		"0.4"
+	],
+	"nozzle_flush_dataset": [
+		"nil",
+		"0",
+		"0",
+		"0"
+	],
+	"nozzle_type": [
+		"nil",
+		"undefine",
+		"undefine",
+		"undefine"
+	],
+	"nozzle_volume": [
+		"nil",
+		"0",
+		"0",
+		"0"
+	],
+	"preferred_orientation": "90",
+	"print_host": "bigtreetech-cb1.local",
+	"printable_area": [
+		"-5x-5",
+		"310x-5",
+		"310x300",
+		"-5x300"
+	],
+	"printable_height": "270",
+	"printer_extruder_id": [
+		"1",
+		"2",
+		"3",
+		"4"
+	],
+	"printer_extruder_variant": [
+		"Direct Drive Standard",
+		"Direct Drive Standard",
+		"Direct Drive Standard",
+		"Direct Drive Standard"
+	],
+	"printer_settings_id": "VZBOT_INDX",
+	"purge_in_prime_tower": "0",
+	"retract_before_wipe": [
+		"80%",
+		"80%",
+		"80%",
+		"80%"
+	],
+	"retract_length_toolchange": [
+		"0",
+		"0",
+		"0",
+		"0"
+	],
+	"retract_lift_above": [
+		"0",
+		"0",
+		"0",
+		"0"
+	],
+	"retract_lift_below": [
+		"0",
+		"0",
+		"0",
+		"0"
+	],
+	"retract_lift_enforce": [
+		"All Surfaces",
+		"All Surfaces",
+		"All Surfaces",
+		"All Surfaces"
+	],
+	"retract_restart_extra": [
+		"0",
+		"0",
+		"0",
+		"0"
+	],
+	"retract_restart_extra_toolchange": [
+		"0",
+		"0",
+		"0",
+		"0"
+	],
+	"retract_when_changing_layer": [
+		"1",
+		"1",
+		"1",
+		"1"
+	],
+	"retraction_distances_when_cut": [
+		"18",
+		"18",
+		"18",
+		"18"
+	],
+	"retraction_length": [
+		"0.8",
+		"0.8",
+		"0.8",
+		"0.8"
+	],
+	"retraction_minimum_travel": [
+		"2",
+		"2",
+		"2",
+		"2"
+	],
+	"retraction_speed": [
+		"40",
+		"40",
+		"40",
+		"40"
+	],
+	"single_extruder_multi_material": "0",
+	"support_multi_bed_types": "1",
+	"thumbnails": "48x48/PNG, 300x300/PNG",
+	"travel_slope": [
+		"3",
+		"3",
+		"3",
+		"3"
+	],
+	"version": "2.2.0.4",
+	"wipe": [
+		"0",
+		"0",
+		"0",
+		"0"
+	],
+	"wipe_distance": [
+		"1",
+		"1",
+		"1",
+		"1"
+	],
+	"z_hop": [
+		"0.2",
+		"0.2",
+		"0.2",
+		"0.2"
+	],
+	"z_hop_types": [
+		"Normal Lift",
+		"Normal Lift",
+		"Normal Lift",
+		"Normal Lift"
+	]
+}
