@@ -78,6 +78,9 @@ unchecked.
 
 Do not set standby / idle temperatures per tool in the slicer. Docked tools
 have no heater; preheat is impossible until the Smart Head picks them up.
+If the slicer still emits `M104 S… T1` (etc.), include `m104.cfg` on the
+printer so those commands apply to the single `[extruder]` and do not raise
+"Extruder not configured".
 
 ## Machine settings
 
