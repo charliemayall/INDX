@@ -113,10 +113,22 @@ macros and does not call them.
 
 ```gcode
 ; VZBOT_INDX tool change - T then post-TC purge station
-T{next_extruder}
+T{next_extruder} TEMP={temperature[next_extruder]}
 M400
 INDX_TC_POST TEMP={temperature[next_extruder]}
 ```
+
+Leave `unretract_after_exit=0` so travel from the station is dry. After the
+slicer reaches the first print XY, unretract there (same amount as
+`post_purge_retract`, default 0.8 mm):
+
+```gcode
+INDX_TC_UNRETRACT
+```
+
+Or set Orca **Extra length on restart after toolchange** to `0.8`. Do **not**
+put `INDX_TC_UNRETRACT` at the end of change-tool G-code - that runs before
+travel back to the part.
 
 Include on the printer (after dock TC macros):
 
