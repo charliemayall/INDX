@@ -95,7 +95,7 @@ a single-tool VZBOT or from a blind copy of Prusa CORE One.
 | `retraction_speed` | `40` mm/s | Same source profile. |
 | `deretraction_speed` | `30` mm/s | Same source profile. |
 | `retract_length_toolchange` | `0` | Avoid double-retract. Park, latch lock/unlock, and macros own filament motion around a toolchange. |
-| `retract_restart_extra_toolchange` | `0` | Same reason. |
+| `retract_restart_extra_toolchange` | `1.2` | Matches `post_purge_retract`. Tip retract is hidden from gcode E; this unretracts it on the first print segment after a toolchange. Leave normal `retract_restart_extra` at `0`. |
 | `retract_when_changing_layer` | `1` | Match Prusa layer-change retract behaviour. |
 | `z_hop` | `0.2` mm | Prusa `retract_lift`; enough clearance without tall hops on every travel. |
 | `wipe` | `0` | No travel wipe fighting printer-side purge/brush. |
@@ -119,16 +119,18 @@ INDX_TC_POST TEMP={temperature[next_extruder]}
 ```
 
 Leave `unretract_after_exit=0` so travel from the station is dry. After the
-slicer reaches the first print XY, unretract there (same amount as
-`post_purge_retract`, default 0.8 mm):
+slicer reaches the first print XY, unretract the tip there (same amount as
+`post_purge_retract`, currently **1.2 mm**).
 
-```gcode
-INDX_TC_UNRETRACT
-```
+`VZBOT_INDX` sets Orca **Extra length on restart after toolchange**
+(`retract_restart_extra_toolchange`) to `1.2` for that hand-off. Do **not**
+also call `INDX_TC_UNRETRACT` in change-tool G-code - that would double-push,
+and it would run before travel back to the part anyway.
 
-Or set Orca **Extra length on restart after toolchange** to `0.8`. Do **not**
-put `INDX_TC_UNRETRACT` at the end of change-tool G-code - that runs before
-travel back to the part.
+If you prefer a macro unretract instead of the slicer setting, zero
+`retract_restart_extra_toolchange` and call `INDX_TC_UNRETRACT` only after
+the first print XY (e.g. from a post-TC helper), not at the end of the
+toolchange block.
 
 Include on the printer (after dock TC macros):
 

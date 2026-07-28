@@ -206,10 +206,10 @@
 		"0"
 	],
 	"retract_restart_extra_toolchange": [
-		"0",
-		"0",
-		"0",
-		"0"
+		"1.2",
+		"1.2",
+		"1.2",
+		"1.2"
 	],
 	"retract_when_changing_layer": [
 		"1",

@@ -221,7 +221,7 @@ Pass only if that box sits strictly inside soft limits (recommend ≥2–5 mm ma
 
 Retract / latch (do not treat as XY):
 
-- Tip retract `post_purge_retract` (0.8) must stay **well under** latch unlock (~11 mm).
+- Tip retract `post_purge_retract` (1.2) must stay **well under** latch unlock (~11 mm).
 - `retract_toolchange` (8) is filament pull for deretract, not latch unlock.
 
 ---
