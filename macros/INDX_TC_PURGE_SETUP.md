@@ -279,10 +279,12 @@ Also check the **bed line** box from the file header (centred on axis mid) does 
 Toolchange G-code:
 
 ```gcode
-T{next_extruder}
+T{next_extruder} TEMP={temperature[next_extruder]}
 M400
-INDX_TC_POST TEMP={temperature[next_extruder]}
+INDX_TC_POST TEMP={temperature[next_extruder]} TYPE={filament_type[next_extruder]}
 ```
+
+`TYPE=` selects material-specific purge speed (`TPU` uses a slower fast purge, ~8 mm3/s). Pass the same on start via `PRINT_START ... TYPE={filament_type[initial_tool]}`.
 
 No second full heat-wait in the slicer. Slice a two-colour part and confirm first extrusion after each TC.
 
