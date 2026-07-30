@@ -221,7 +221,8 @@ Pass only if that box sits strictly inside soft limits (recommend ≥2–5 mm ma
 
 Retract / latch (do not treat as XY):
 
-- Tip retract `post_purge_retract` (1.2) must stay **well under** latch unlock (~11 mm).
+- Tip retract `post_purge_retract` (default 0.8) must stay **well under** latch unlock (~11 mm).
+- With `unretract_after_exit=0`, the slicer unretracts after it travels to the next print XY. Set `post_purge_retract` **<=** that unretract length (usually Orca `retraction_length`). If tip retract is longer, the first extrusion stays short. Do not size it to `retract_restart_extra_toolchange` - Orca often ignores that with the prime tower off.
 - `retract_toolchange` (8) is filament pull for deretract, not latch unlock.
 
 ---
@@ -286,7 +287,7 @@ INDX_TC_POST TEMP={temperature[next_extruder]} TYPE={filament_type[next_extruder
 
 `TYPE=` selects material-specific purge speed (`TPU` uses a slower fast purge, ~8 mm3/s). Pass the same on start via `PRINT_START ... TYPE={filament_type[initial_tool]}`.
 
-No second full heat-wait in the slicer. Slice a two-colour part and confirm first extrusion after each TC.
+No second full heat-wait in the slicer. Slice a two-colour part and confirm first extrusion after each TC. Check that `post_purge_retract` is <= the unretract Orca emits after the toolchange (typically `G1 E` equal to `retraction_length`).
 
 ---
 
@@ -308,7 +309,7 @@ No second full heat-wait in the slicer. Slice a two-colour part and confirm firs
 - [ ] Flush endpoints inside bin
 - [ ] Brush X/Y ranges inside limits and on bristles
 - [ ] Full post-TC box inside soft limits with margin
-- [ ] Tip retract ≪ latch unlock
+- [ ] Tip retract ≪ latch unlock, and `post_purge_retract` <= slicer post-TC unretract
 - [ ] `SKIP_PURGE` OK → full `INDX_TC_POST` OK → `INDX_TC_PURGE_TEST` OK
 
 XY envelope reference (same formulae) also lives in the header comment block of `indx-tc-purge.cfg`.
