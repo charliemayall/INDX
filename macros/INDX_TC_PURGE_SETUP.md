@@ -221,8 +221,9 @@ Pass only if that box sits strictly inside soft limits (recommend ≥2–5 mm ma
 
 Retract / latch (do not treat as XY):
 
-- Tip retract `post_purge_retract` (default 0.8) must stay **well under** latch unlock (~11 mm).
-- With `unretract_after_exit=0`, the slicer unretracts after it travels to the next print XY. Set `post_purge_retract` **<=** that unretract length (usually Orca `retraction_length`). If tip retract is longer, the first extrusion stays short. Do not size it to `retract_restart_extra_toolchange` - Orca often ignores that with the prime tower off.
+- Tip retract must stay **well under** latch unlock (~11 mm).
+- With `unretract_after_exit=0`, the slicer unretracts after it travels to the next print XY. Tip retract must be **<=** that unretract (usually Orca `retraction_length` / `new_retract_length`). If tip is longer, the first extrusion stays short. Do not size tip to `retract_restart_extra_toolchange` - Orca often ignores that with the prime tower off.
+- Per-filament: pass `RETRACT={new_retract_length}` into `INDX_TC_POST`. Tip becomes `max(0, RETRACT - post_purge_adjust)`. Set `post_purge_adjust` on the printer (e.g. `0.2`) for a little net prime after unretract. Fallback without `RETRACT=` is `post_purge_retract`. Absolute override: `POST_PURGE_RETRACT=`.
 - `retract_toolchange` (8) is filament pull for deretract, not latch unlock.
 
 ---
@@ -282,12 +283,14 @@ Toolchange G-code:
 ```gcode
 T{next_extruder} TEMP={temperature[next_extruder]}
 M400
-INDX_TC_POST TEMP={temperature[next_extruder]} TYPE={filament_type[next_extruder]}
+INDX_TC_POST TEMP={temperature[next_extruder]} TYPE={filament_type[next_extruder]} RETRACT={new_retract_length}
 ```
 
 `TYPE=` selects material-specific purge speed (`TPU` uses a slower fast purge, ~8 mm3/s). Pass the same on start via `PRINT_START ... TYPE={filament_type[initial_tool]}`.
 
-No second full heat-wait in the slicer. Slice a two-colour part and confirm first extrusion after each TC. Check that `post_purge_retract` is <= the unretract Orca emits after the toolchange (typically `G1 E` equal to `retraction_length`).
+`RETRACT={new_retract_length}` is the incoming filament's retraction length (what Orca typically unretracts after the TC travel). Tip retract = that value minus `post_purge_adjust`. After slicing, confirm the unretract `G1 E...` matches and tip <= that length.
+
+No second full heat-wait in the slicer. Slice a two-colour part and confirm first extrusion after each TC.
 
 ---
 
@@ -309,7 +312,7 @@ No second full heat-wait in the slicer. Slice a two-colour part and confirm firs
 - [ ] Flush endpoints inside bin
 - [ ] Brush X/Y ranges inside limits and on bristles
 - [ ] Full post-TC box inside soft limits with margin
-- [ ] Tip retract ≪ latch unlock, and `post_purge_retract` <= slicer post-TC unretract
+- [ ] Tip retract ≪ latch unlock, and tip <= slicer post-TC unretract (`RETRACT={new_retract_length}`)
 - [ ] `SKIP_PURGE` OK → full `INDX_TC_POST` OK → `INDX_TC_PURGE_TEST` OK
 
 XY envelope reference (same formulae) also lives in the header comment block of `indx-tc-purge.cfg`.
