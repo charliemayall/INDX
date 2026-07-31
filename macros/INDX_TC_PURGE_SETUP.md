@@ -286,7 +286,7 @@ M400
 INDX_TC_POST TEMP={temperature[next_extruder]} TYPE={filament_type[next_extruder]} RETRACT={new_retract_length}
 ```
 
-`TYPE=` selects material-specific purge speed (`TPU` uses a slower fast purge, ~8 mm3/s). Pass the same on start via `PRINT_START ... TYPE={filament_type[initial_tool]}`.
+`TYPE=` selects material-specific purge speed (`TPU` uses ~8 mm3/s for both intro and wiggle segments). Pass the same on start via `PRINT_START ... TYPE={filament_type[initial_tool]}`.
 
 `RETRACT={new_retract_length}` is the incoming filament's retraction length (what Orca typically unretracts after the TC travel). Tip retract = that value minus `post_purge_adjust`. After slicing, confirm the unretract `G1 E...` matches and tip <= that length.
 
