@@ -853,7 +853,10 @@ The INDX firmware plugin provides a set of `.cfg` files you include from `printe
 | `indx-tc-macros.cfg` | Tool change logic: `CHANGE_TOOL`, `PARK_TOOL`, boot detection. Do not edit. |
 | `indx-cal.cfg` | Calibration macros: dock position, XY/Z offset calibration. |
 | `homing.cfg` | `[homing_override]`: Y then X, ensure a tool (T0 when possible), then Z. |
-| `indx-helpers.cfg` | Optional helpers: latch lock/unlock, load-cell tool presence, RESUME wrapper for mid-print detect. Include after `indx-tc-macros.cfg`. |
+| `indx-tool-state.cfg` | `[tool_state]` config for the tool_state klippy extra (load cell / ringdown sensors, fail/retry/recover templates). |
+| `indx-helpers.cfg` | Optional helpers: latch lock/unlock, `VERIFY_TOOL_PRESENT` alias, RESUME wrapper for mid-print detect. Include after `indx-tool-state.cfg`. |
+
+Install the `tool_state` klippy extra (sibling repo: `tool_state/`, run `./install.sh`) into your Klipper/Kalico checkout before enabling tool detect.
 
 Include them from your `printer.cfg`:
 
@@ -862,7 +865,8 @@ Include them from your `printer.cfg`:
 [include indx/indx-tc-macros.cfg]
 [include indx/indx-cal.cfg]
 [include indx/homing.cfg]
-[include indx/indx-helpers.cfg]   # after tc-macros; after mainsail.cfg in printer.cfg
+[include indx/indx-tool-state.cfg]
+[include indx/indx-helpers.cfg]   # after tool-state; after mainsail.cfg in printer.cfg
 ```
 
 Klipper allows only one `[homing_override]`. If your printer already has one (sensorless current, bed raiser, etc.), merge the INDX sequence into yours instead of including `homing.cfg` as-is.
@@ -879,7 +883,7 @@ INDX owns the `RESUME` command and `rename_existing: RESUME_BASE`. Move Mainsail
 4. In `CANCEL_PRINT`, `PAUSE`, and the renamed section body, change every `SET_GCODE_VARIABLE MACRO=RESUME` to `MACRO=_CLIENT_RESUME`
 5. Keep `RESUME_BASE VELOCITY=...` at the end of `_CLIENT_RESUME`
 
-Call chain after the patch: `RESUME` (INDX) -> optional `_RESUME_PRESENCE_*` on tool-detect fail -> `_CLIENT_RESUME` (Mainsail) -> `RESUME_BASE` (Klipper). If `_CLIENT_RESUME` is missing, INDX falls back to `RESUME_BASE` so resume still works.
+Call chain after the patch: `RESUME` (INDX) -> optional `TOOL_STATE_RESUME` on tool-detect fail -> `_CLIENT_RESUME` (Mainsail) -> `RESUME_BASE` (Klipper). If `_CLIENT_RESUME` is missing, INDX / tool_state fall back to `RESUME_BASE` so resume still works.
 
 After editing, run `FIRMWARE_RESTART`. `HELP` should show INDX's RESUME description.
 
@@ -905,7 +909,7 @@ The INDX macro package includes a ready-to-use `[homing_override]` in `homing.cf
 1. If Z is already known: raise to `probe_z_clearance` (set in `indx.cfg`)
 2. Home Y, then move to `clearance_y` so X does not sweep into the dock
 3. Home X
-4. Before Z: require a seated tool (`VERIFY_TOOL_PRESENT`). If a tool is already locked, Z homes with that tool (its XY/Z offsets are re-applied before the probe). If the head is empty and the dock is usable, pick T0. If Z has never been homed, dock pickup is unsafe - seat and lock a tool by hand after load-cell calibration, then home. Empty-head Z without a known tool is refused (the load cell will not trigger without a nozzle).
+4. Before Z: require a seated tool (`TOOL_STATE_VERIFY`). If a tool is already locked, Z homes with that tool (its XY/Z offsets are re-applied before the probe). If the head is empty and the dock is usable, pick T0. If Z has never been homed, dock pickup is unsafe - seat and lock a tool by hand after load-cell calibration, then home. Empty-head Z without a known tool is refused (the load cell will not trigger without a nozzle).
 5. Move to the probe XY (`probe_x` / `probe_y`, or bed centre) and home Z
 
 `CAL_Z` still stores per-tool Z offsets relative to T0. Homing no longer requires T0 when another tool is already locked - toolchanges keep applying `tool_z + global_z`, so nozzle height stays consistent after a non-T0 Z home. Mesh or tilt after that home (as in `PRINT_START`) keeps the frame consistent.
