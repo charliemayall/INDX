@@ -4,7 +4,39 @@
 
 ---
 
+## Welcome to the (`personal`) branch, come on in!
+
+This is the branch my printer is checked out on. Almost nothing is the same as upstream `main` (`BondtechAB/INDX`). You can't use this as a copy-paste drop in, there is lots of stuff tailored to my printer specifically. Some macros rely on modded firmware that I haven't shared yet.
+
+## Extra stuff on this branch:
+
+| File | Role |
+|------|------|
+| `homing.cfg` | Homing override (Y then X, Z with any seated tool, safe Z-hop) |
+| `indx-helpers.cfg` | Latch helpers, tool-state aliases, Mainsail-aware `RESUME` |
+| `indx-tool-state.cfg` | Config for the `tool_state` klippy extra (load cell / ringdown presence) (require modded induction coil driver firmware)|
+| `indx-filament-force.cfg` | Config for load_cell `filament_force` monitoring (runout / jam / clog detection) |
+| `indx-tc-purge.cfg` | Purge-station post-toolchange (`INDX_TC_POST`, unretract, debug retract) |
+| `print_start.cfg` | Printer `PRINT_START` (tilt, mesh, filament_force arming, `INDX_TC_RESET`) |
+| `m104.cfg` / `m109.cfg` | Single-extruder wrappers so slicer `M104 … T1` does not error |
+| `load_cell_pressurise.cfg` | Load-cell nozzle pressure detection for extrusion-less priming |
+| `INDX_TC_PURGE_SETUP.md` | Purge-station setup notes |
+
+Behaviour that diverges from stock upstream macros:
+
+- Tool presence verify on pickup/park (and optional mid-print monitor) via `tool_state`, with soft pause + hand reseat + `RESUME` recheck.
+- Optional filament-force scoring around toolchange E moves; suppressed during latch, armed from `PRINT_START`.
+- Station purge after each toolchange (`INDX_TC_POST`), including first-use purge, tip retract/unretract, and `TYPE=TPU` speed paths.
+- Mid-print `TEMP_OVERRIDE TOOL=<n> TEMP=<c>` so a manual nozzle bump survives the next slicer `T` / `INDX_TC_POST` (cleared by `INDX_TC_RESET` at print start).
+- `PRINT_START`: soft-heat before Z home, two-phase `SAFE_Z_TILT_ADJUST`, bed-mesh load, optional `TOGGLE_QUICK_START`.
+- Homing and dock motion: Y-before-X, home Z with any tool, `dock_dir` for front or rear racks, fixed approach/engage feedrates, TMC family detection for `MODE_*`.
+- Cal and load fixes: skip-Z-correction honouring, load-cell cal not leaving the tool locked in the dock, slower TPU guided load, babystep bake-in on Z apply.
+
+---
+
 ## Table of Contents
+
+0. [This branch (`personal`)](#this-branch-personal)
 
 **Part 1: What is INDX?**
 
