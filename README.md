@@ -311,7 +311,7 @@ The Bondtech INDX PCB is mounted inside the Smart Head and is the central electr
 | Endstop | 3V3, SIGNAL, GND | 3.3V logic level |
 | USB | VBUS, DP+, DP−, GND, GND | Supports accessories such as camera or Beacon probe scanner |
 | CAN termination jumper | — | Enable/disable CAN bus termination |
-| CAN Reset jumper | — | Puts the board into DFU mode for firmware flashing; remove after flashing |
+| CAN Reset jumper | — | Hardware fallback to enter DFU/bootloader for flashing; remove after flashing |
 | Communication switch | CAN / USB | Selects between CAN-FD and USB communication modes; must match the switch position on the Link Board |
 
 **Status LEDs**
@@ -474,7 +474,7 @@ All electronics are pre-installed inside the Smart Head; no internal wiring requ
 - **USB**: 5-pin, supports accessories such as a camera or Beacon probe scanner. Pin 1 VBUS (5V), Pin 2 DP+, Pin 3 DP−, Pin 4 GND, Pin 5 GND
 - **Built-in accelerometer**: for resonance measurement and automatic input shaper calibration in Klipper
 - **CAN termination jumper**: fitting the jumper enables the 120 Ω end-of-line termination resistor. Fit only on boards at the physical ends of the CAN bus.
-- **CAN reset jumper**: Klipper: short the jumper to enter DFU mode for flashing. RRF: fit the jumper for CAN reset (also resets the CAN address). See the [Duet INDX Toolboard documentation](https://docs.duet3d.com/en/Duet3D_hardware/Duet_3_family/INDX_Toolboard).
+- **CAN reset jumper**: Klipper/Kalico: software bootloader entry is preferred when firmware is already installed (see [Enter the bootloader](#enter-the-bootloader)); short the jumper to force DFU mode if needed. RRF: fit the jumper for CAN reset (also resets the CAN address). See the [Duet INDX Toolboard documentation](https://docs.duet3d.com/en/Duet3D_hardware/Duet_3_family/INDX_Toolboard).
 - **Status LEDs**: 3V3, VIN, STATUS, ACTIVITY
 
 Induction heating and contactless IR temperature sensing are handled internally by the INDX VF PCB; no additional wiring or configuration needed.
@@ -715,9 +715,36 @@ Flashing is done over SSH from your computer into the Raspberry Pi (or other hos
 
 You should now have a terminal prompt on your printer's host computer.
 
-**Enter the bootloader**
+###### Enter the bootloader
 
-Flashing happens while the Bondtech INDX PCB is in bootloader mode. If the board already has firmware, put it into the bootloader by fitting the **CAN RESET jumper** on the INDX MCU PCB while powering the board up. In bootloader mode the board enumerates on the host as a Microchip USB device (vendor `04d8`, product `e483`), identified as **"INDX Toolboard Bootloader"** by Bondtech AB. Confirm it is present with:
+Flashing happens while the Bondtech INDX PCB is in bootloader mode. In bootloader mode the board enumerates on the host as a Microchip USB device (vendor `04d8`, product `e483`), identified as **"INDX Toolboard Bootloader"** by Bondtech AB.
+
+*Software (recommended if firmware is already installed)*
+
+If the board is already running Klipper or Kalico firmware and the communication switches on both the INDX MCU PCB and Link Board are set to **USB**, you can request the bootloader over USB - the same [1200 baud method](https://www.klipper3d.org/Bootloader_Entry.html) used by other Klipper boards:
+
+1. Stop the Klipper service so the serial port is free (`sudo systemctl stop klipper`)
+2. Find the toolboard serial device:
+
+```bash
+ls /dev/serial/by-id/usb-Bondtech_INDX*
+```
+
+3. Request the bootloader (replace the path with your device):
+
+```bash
+stty 1200 < /dev/serial/by-id/usb-Bondtech_INDX_<serial>-if00
+```
+
+4. Confirm the board rebooted into the bootloader:
+
+```bash
+lsusb | grep 04d8:e483
+```
+
+*Hardware (first flash or if software entry fails)*
+
+Fit the **CAN RESET jumper** on the INDX MCU PCB while powering the board up. Confirm the bootloader is present:
 
 ```bash
 lsusb | grep 04d8:e483
