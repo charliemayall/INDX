@@ -721,6 +721,8 @@ Flashing happens while the Bondtech INDX PCB is in bootloader mode. In bootloade
 
 *Software (recommended if firmware is already installed)*
 
+Skip this if you will flash with the serial device path in the Kalico or Klipper steps below; that command requests the bootloader for you.
+
 If the board is already running Klipper or Kalico firmware and the communication switches on both the INDX MCU PCB and Link Board are set to **USB**, you can request the bootloader over USB - the same [1200 baud method](https://www.klipper3d.org/Bootloader_Entry.html) used by other Klipper boards:
 
 1. Stop the Klipper service so the serial port is free (`sudo systemctl stop klipper`)
@@ -733,7 +735,7 @@ ls /dev/serial/by-id/usb-Bondtech_INDX*
 3. Request the bootloader (replace the path with your device):
 
 ```bash
-stty 1200 < /dev/serial/by-id/usb-Bondtech_INDX_<serial>-if00
+stty -F /dev/serial/by-id/usb-Bondtech_INDX_<serial>-if00 1200
 ```
 
 4. Confirm the board rebooted into the bootloader:
@@ -741,6 +743,10 @@ stty 1200 < /dev/serial/by-id/usb-Bondtech_INDX_<serial>-if00
 ```bash
 lsusb | grep 04d8:e483
 ```
+
+Success looks like **"INDX Toolboard Bootloader"** and a new USB device number. If `lsusb` still shows **"INDX"** with the same device number, the board never left application firmware. Check the USB switches, retry `stty -F`, or use the hardware jumper below.
+
+Do not compile after this step. The bootloader window is short; `make` will miss it.
 
 *Hardware (first flash or if software entry fails)*
 
@@ -752,26 +758,37 @@ lsusb | grep 04d8:e483
 
 **Kalico (recommended)**
 
-Kalico ships with native INDX support built in — both the host module and the MCU firmware are part of the Kalico source tree, so there is nothing extra to install. Build and flash from your Kalico directory (usually `~/klipper`):
+Kalico ships with native INDX support: the host module and MCU firmware are in the Kalico source tree, so there is nothing extra to install. Build first, then flash from your Kalico directory (usually `~/klipper`).
+
+`make flash FLASH_DEVICE=04d8:e483` does not request the bootloader. It only talks to a board that is already in DFU. Prefer the serial device so the flash script requests the bootloader itself:
 
 ```bash
 cd ~/klipper
+sudo systemctl stop klipper
 KCONFIG_CONFIG=board_configs/bondtech_indx_usb.config make
+KCONFIG_CONFIG=board_configs/bondtech_indx_usb.config make flash FLASH_DEVICE=/dev/serial/by-id/usb-Bondtech_INDX_<serial>-if00
+```
+
+If you already entered the bootloader with `stty -F` or the CAN RESET jumper, flash immediately without rebuilding:
+
+```bash
 KCONFIG_CONFIG=board_configs/bondtech_indx_usb.config make flash FLASH_DEVICE=04d8:e483
 ```
+
+If `dfu-util` reports `No DFU capable USB device available`, the board is still running application firmware. Confirm `lsusb` shows **INDX Toolboard Bootloader**, not just **INDX**, then retry.
 
 The `board_configs/bondtech_indx_usb.config` build config is included with Kalico. It preselects the SAME51 MCU, USB communication, and the INDX heater feature, so you don't need to run `make menuconfig`.
 
 **Klipper (mainline)**
 
-Mainline Klipper does not include INDX support. Add it with the `indx_klipper` module, then build and flash:
+Mainline Klipper does not include INDX support. Add it with the `indx_klipper` module, then build and flash the same way (serial path preferred):
 
 ```bash
 git clone https://github.com/BondtechAB/indx_klipper.git
 cd indx_klipper
 ./install.sh /home/pi/klipper        # adjust the path to your Klipper install
 make
-make flash FLASH_DEVICE=04d8:e483
+make flash FLASH_DEVICE=/dev/serial/by-id/usb-Bondtech_INDX_<serial>-if00
 ```
 
 Once flashing is complete, remove the CAN RESET jumper (if you fitted one), power-cycle the Smart Head, and proceed to firmware configuration.
