@@ -19,6 +19,7 @@ This is the branch my printer is checked out on. Almost nothing is the same as u
 | `indx-tc-purge.cfg` | Purge-station post-toolchange (`INDX_TC_POST`, unretract, debug retract) |
 | `print_start.cfg` | Printer `PRINT_START` (tilt, mesh, filament_force arming, `INDX_TC_RESET`) |
 | `m104.cfg` / `m109.cfg` | Single-extruder wrappers so slicer `M104 … T1` does not error |
+| `mainsail_tool_remap.cfg` | `_MAINSAIL_TOOL_MAP` for Mainsail slicer-to-dock remap (`Tn` / `PRINT_START`; not `CHANGE_TOOL`) |
 | `load_cell_pressurise.cfg` | Load-cell nozzle pressure detection for extrusion-less priming |
 | `INDX_TC_PURGE_SETUP.md` | Purge-station setup notes |
 
@@ -29,6 +30,7 @@ Behaviour that diverges from stock upstream macros:
 - Station purge after each toolchange (`INDX_TC_POST`), including first-use purge, tip retract/unretract, and `TYPE=TPU` speed paths.
 - Mid-print `TEMP_OVERRIDE TOOL=<n> TEMP=<c>` so a manual nozzle bump survives the next slicer `T` / `INDX_TC_POST` (cleared by `INDX_TC_RESET` at print start).
 - `PRINT_START`: soft-heat before Z home, two-phase `SAFE_Z_TILT_ADJUST`, bed-mesh load, optional `TOGGLE_QUICK_START`.
+- Optional Mainsail tool remap: include `mainsail_tool_remap.cfg`; slicer `Tn` and `PRINT_START TOOL=` follow `_MAINSAIL_TOOL_MAP`. `CHANGE_TOOL` / homing / cal stay physical.
 - Homing and dock motion: Y-before-X, home Z with any tool, `dock_dir` for front or rear racks, fixed approach/engage feedrates, TMC family detection for `MODE_*`.
 - Cal and load fixes: skip-Z-correction honouring, load-cell cal not leaving the tool locked in the dock, slower TPU guided load, babystep bake-in on Z apply.
 
@@ -932,6 +934,7 @@ The INDX firmware plugin provides a set of `.cfg` files you include from `printe
 | `homing.cfg` | `[homing_override]`: Y then X, ensure a tool (T0 when possible), then Z. |
 | `indx-tool-state.cfg` | `[tool_state]` config for the tool_state klippy extra (load cell / ringdown sensors, fail/retry/recover templates). |
 | `indx-helpers.cfg` | Optional helpers: latch lock/unlock, `VERIFY_TOOL_PRESENT` alias, RESUME wrapper for mid-print detect. Include after `indx-tool-state.cfg`. |
+| `mainsail_tool_remap.cfg` | Optional `_MAINSAIL_TOOL_MAP` for the Mainsail remap UI. Do not add builtin `Tn` wrappers. |
 
 Install the `tool_state` klippy extra (sibling repo: `tool_state/`, run `./install.sh`) into your Klipper/Kalico checkout before enabling tool detect.
 
@@ -944,6 +947,7 @@ Include them from your `printer.cfg`:
 [include indx/homing.cfg]
 [include indx/indx-tool-state.cfg]
 [include indx/indx-helpers.cfg]   # after tool-state; after mainsail.cfg in printer.cfg
+[include indx/mainsail_tool_remap.cfg]  # optional; Mainsail slicer-to-dock remap
 ```
 
 Klipper allows only one `[homing_override]`. If your printer already has one (sensorless current, bed raiser, etc.), merge the INDX sequence into yours instead of including `homing.cfg` as-is.
