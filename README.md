@@ -29,7 +29,7 @@ Behaviour that diverges from stock upstream macros:
 - Optional filament-force scoring around toolchange E moves; suppressed during latch, armed from `PRINT_START`.
 - Station purge after each toolchange (`INDX_TC_POST`), including first-use purge, tip retract/unretract, and `TYPE=TPU` speed paths.
 - Mid-print `TEMP_OVERRIDE TOOL=<n> TEMP=<c>` so a manual nozzle bump survives the next slicer `T` / `INDX_TC_POST` (cleared by `INDX_TC_RESET` at print start).
-- `PRINT_START`: soft-heat before Z home, two-phase `SAFE_Z_TILT_ADJUST`, bed-mesh load, optional `TOGGLE_QUICK_START`.
+- `PRINT_START`: soft-heat before Z home, two-phase `SAFE_Z_TILT_ADJUST`, bed-mesh load, optional `TOGGLE_QUICK_START`. `TOOLCHANGES=0` runs `INDX_TC_POST` (Orca omits change-filament G-code on single-tool slices).
 - Optional Mainsail tool remap: include `mainsail_tool_remap.cfg`; slicer `Tn` and `PRINT_START TOOL=` follow `_MAINSAIL_TOOL_MAP`. `CHANGE_TOOL` / homing / cal stay physical.
 - Homing and dock motion: Y-before-X, home Z with any tool, `dock_dir` for front or rear racks, fixed approach/engage feedrates, TMC family detection for `MODE_*`.
 - Cal and load fixes: skip-Z-correction honouring, load-cell cal not leaving the tool locked in the dock, slower TPU guided load, babystep bake-in on Z apply.
